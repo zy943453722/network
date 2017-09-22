@@ -41,7 +41,7 @@ void *consumer(void *n)//消费者用于随机获取红包个数
 {
    int nn = *(int*)n;
    pthread_mutex_lock(&lock);
-    printf("number%d\n",nn);
+    //printf("number%d\n",nn);
    if(money > 0 && per[nn].flag == 0)//还没抢过
     {
         if(num > 1)
@@ -69,9 +69,9 @@ void *consumer(void *n)//消费者用于随机获取红包个数
             num--;
         }
     }
-  printf("mutex\n");
+  //printf("mutex\n");
     pthread_mutex_unlock(&lock);
-    printf("exit\n");
+    //printf("exit\n");
     pthread_cancel(pthread_self());
 }
 int main()
@@ -84,16 +84,13 @@ int main()
     {
        printf("请输入红包的金额：\n");
        scanf("%lf",&value);
-       printf("请输入红包个数:");
+       printf("请输入红包个数:\n");
        scanf("%d",&num);
-        if(value >= MIN && value <= MAX)
+        if(value >= MIN && value <= MAX && num > 0)
         {
             break;
         }
-        if(num > 0 && num <= Total)
-        {
-            break;
-        }
+        printf("输入有误，请重输！\n");
     }
        for(i = 0; i < Total; i++)
        {
@@ -109,20 +106,22 @@ int main()
    //pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);//使调用线程脱离与进程只能跟其他线程同步
    pthread_create(&th_a,NULL,producer,(void*)&value);
     pthread_join(th_a,NULL);
+    int args[Total];
    for(i = 0; i < Total;i++)
     {
+        args[i] = i;
         if(per[i].flag == 0)
         {
-            pthread_create(&th_b[i],NULL,consumer,(void*)&i);
+            pthread_create(&th_b[i],NULL,consumer,(void*)&args[i]);
     //        usleep(100);
-            printf("create success\n");
-            printf("i = %d\n",i);
+            //printf("create success\n");
+           // printf("i = %d\n",i);
         }
     }
     for(i = 0; i < Total; i++)
     {
         pthread_join(th_b[i],NULL);
-       printf("i++ = %d\n",i);
+       //printf("i++ = %d\n",i);
     }
     pthread_mutex_destroy(&lock);
     return 0;
