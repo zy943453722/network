@@ -36,7 +36,7 @@ int main()
         exit(-1);
     }
     //cout << "b" <<endl;
-    if((columns = dbi.db_get_outcolumns(&q)) == DBI_ERROR)
+    if((columns = dbi.db_get_Outcolumns(&q)) == DBI_ERROR)
     {
         dbi.db_get_error();
         exit(-1);

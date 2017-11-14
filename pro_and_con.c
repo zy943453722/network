@@ -3,6 +3,7 @@
 #include<time.h>
 #include<stdlib.h>
 #include<pthread.h>
+#include<unistd.h>
 #define BUFFER_SIZE 8 
 
 #if 0
@@ -64,7 +65,7 @@
 struct prodcons {
     int buffer[BUFFER_SIZE]; 
     pthread_mutex_t lock;      //互斥LOCK
-    int readpos , writepos; 
+    int readpos , writepos;    //定义写和读的位置
     pthread_cond_t notempty;   //缓冲区非空条件判断
     pthread_cond_t notfull;    //缓冲区未满条件判断
 };
@@ -87,9 +88,9 @@ void init(struct prodcons * b){
 
 void put(struct prodcons* b,int data){
     pthread_mutex_lock(&b->lock);
-    if((b->writepos + 1) % BUFFER_SIZE == b->readpos)
+    if((b->writepos + 1) % BUFFER_SIZE == b->readpos)//这是缓冲区满了的情况，留一个空用于发送-1这个信号
     {
-        pthread_cond_wait(&b->notfull, &b->lock) ;
+        pthread_cond_wait(&b->notfull, &b->lock);
     }
 //    pthread_mutex_lock(&b->lock);
 //    大家仔细理解互斥锁的位置，以及pthread_cond_wait函数的内核实现（解锁，休眠让出cpu，条件满足后被内核唤醒，上锁，形成临界区，保护资源）
@@ -140,7 +141,7 @@ void *producer(void *data)
         put(&buffer, n);
     }
     
-    put(&buffer, OVER);
+    put(&buffer, OVER);//发信号说-1已经放进去了，说明没内容写了
     
     return NULL;
 }
@@ -151,7 +152,7 @@ void *consumer(void * data)
     {
         d = get(&buffer);
 //        sleep(100);
-        if(d == OVER)
+        if(d == OVER)//说明生产者已经写完
             break;
         printf("consumerd the num is %d\n", d);
     }

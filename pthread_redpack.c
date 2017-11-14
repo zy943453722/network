@@ -41,8 +41,9 @@ void *consumer(void *n)//消费者用于随机获取红包个数
 {
    int nn = *(int*)n;
    pthread_mutex_lock(&lock);
-    //printf("number%d\n",nn);
-   if(money > 0 && per[nn].flag == 0)//还没抢过
+    printf("number%d\n",nn);
+  if(money > 0)//还没抢过
+   //if(money > 0)//还没抢过
     {
         if(num > 1)
         {
@@ -107,13 +108,13 @@ int main()
    pthread_create(&th_a,NULL,producer,(void*)&value);
     pthread_join(th_a,NULL);
     int args[Total];
-   for(i = 0; i < Total;i++)
+    for(i = 0; i < Total;i++)
     {
         args[i] = i;
         if(per[i].flag == 0)
         {
             pthread_create(&th_b[i],NULL,consumer,(void*)&args[i]);
-    //        usleep(100);
+            //usleep(1);
             //printf("create success\n");
            // printf("i = %d\n",i);
         }
